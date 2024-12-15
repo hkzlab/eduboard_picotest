@@ -104,7 +104,7 @@ int main() {
 	cur_row = 0;
 
 	add_repeating_timer_us(-500, led_update_timer_isr, NULL, &led_update_timer);
-	add_repeating_timer_us(-400000, snow_update_timer_isr, NULL, &snow_update_timer);
+	add_repeating_timer_us(-40000, snow_update_timer_isr, NULL, &snow_update_timer);
 
 	while(true);
 
