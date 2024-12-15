@@ -14,6 +14,7 @@ add_dependencies(pico_mcp23017 pico_interfaces)
 # Link to pico_stdlib (gpio, time, etc. functions)
 target_link_libraries(${PROJECT_NAME} 
     pico_stdlib
+    pico_rand
     hardware_pio
     pico_mcp23017
 )

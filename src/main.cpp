@@ -1,6 +1,9 @@
 #include <stdio.h>
-#include "pico/stdlib.h"
+#include <string.h>
+
+#include <pico/stdlib.h>
 #include <pico/platform.h>
+#include <pico/rand.h>
 
 #include "hardware/i2c.h"
 #include "mcp23017.h"
@@ -22,7 +25,13 @@ const uint8_t __in_flash() row_address_translation[8] = {
 Mcp23017 mcp1(i2c0, 0x20); // MCP with A0, A1 and A2 to GND
 
 static volatile uint8_t cur_row = 0;
-static struct repeating_timer timer;
+static volatile bool invert = false;
+static struct repeating_timer led_update_timer, snow_update_timer;
+
+static volatile uint8_t snow[8] = {
+	0, 0, 0, 0,
+	0, 0, 0, 0
+};
 
 void setup_output(Mcp23017 mcp) {
 	int result;
@@ -31,20 +40,50 @@ void setup_output(Mcp23017 mcp) {
 	result = mcp.set_io_direction(0x0000); // Set all pins to output
 }
 
-bool timer_isr(struct repeating_timer *t) {
+bool led_update_timer_isr(struct repeating_timer *t) {
 	// Turn off the columns (leave the row selected, otherwise we risk shortly blinking the wrong led!!!)
 	mcp1.set_all_output_bits((row_address_translation[cur_row & 0x7]) << 5);
 	mcp1.flush_output();
 
 	// Increment the row
 	cur_row += 1;
-	uint8_t cur_col = 1 << (cur_row & 0x7);
 
 	// Turn on the column leds on the new row
-	mcp1.set_all_output_bits((((uint16_t)cur_col) << 8) | ((row_address_translation[cur_row & 0x7]) << 5));
+	uint8_t col_data = invert ? ~snow[cur_row & 0x07] : snow[cur_row & 0x07];
+	mcp1.set_all_output_bits((((uint16_t)col_data) << 8) | ((row_address_translation[cur_row & 0x07]) << 5));
 	mcp1.flush_output();
 
     return true;
+}
+
+bool check_full_matrix() {
+	for(uint8_t idx = 0; idx < sizeof(snow); idx++) {
+		if(snow[idx] != 0xFF) return false;
+	}
+
+	return true;
+}
+
+bool snow_update_timer_isr(struct repeating_timer *t) {
+	const uint8_t snow_len = sizeof(snow);
+	uint snow_diff;
+
+	if(check_full_matrix()) {
+		memset((void*)snow, 0, sizeof(snow));
+		invert = !invert;
+	}
+
+	// Start from bottom, go upward, skip the first line
+	for(uint8_t idx = sizeof(snow) - 1; idx >= 1; idx--) {
+		snow_diff = (snow[idx] ^ snow[idx - 1]) & snow[idx - 1]; // The flakes that move from above to bottom
+		snow[idx] |= snow_diff;
+		snow[idx - 1] &= ~snow_diff;
+	}
+
+	// Then generate new snowflakes 
+	snow[0] |= (uint8_t)(get_rand_32() & get_rand_32() & get_rand_32());
+	
+	return true;
 }
 
 int main() {
@@ -64,7 +103,8 @@ int main() {
 
 	cur_row = 0;
 
-	add_repeating_timer_us(-1000, timer_isr, NULL, &timer);
+	add_repeating_timer_us(-500, led_update_timer_isr, NULL, &led_update_timer);
+	add_repeating_timer_us(-400000, snow_update_timer_isr, NULL, &snow_update_timer);
 
 	while(true);
 
