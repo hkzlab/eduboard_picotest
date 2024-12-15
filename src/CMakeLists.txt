@@ -6,12 +6,17 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/main.c
 )
 
+add_subdirectory(modules/pico-interfaces)
+add_subdirectory(modules/pico-mcp23017)
+
+add_dependencies(pico_mcp23017 pico_interfaces)
+
 # Link to pico_stdlib (gpio, time, etc. functions)
 target_link_libraries(${PROJECT_NAME} 
     pico_stdlib
     hardware_pio
+    pico_mcp23017
 )
-
 
 # Create map/bin/hex/uf2 files
 pico_add_extra_outputs(${PROJECT_NAME})

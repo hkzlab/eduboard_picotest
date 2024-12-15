@@ -1,0 +1,6 @@
+[submodule "src/modules/pico-interfaces"]
+	path = src/modules/pico-interfaces
+	url = https://github.com/adamboardman/pico-interfaces
+[submodule "src/modules/pico-mcp23017"]
+	path = src/modules/pico-mcp23017
+	url = https://github.com/adamboardman/pico-mcp23017
