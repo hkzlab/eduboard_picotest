@@ -20,20 +20,20 @@ void setup_output(Mcp23017 mcp) {
 
 int main() {
 	stdio_init_all();
-	sleep_ms(2000);
+	busy_wait_ms(2000);
 	printf("Starting up\n");
 
 	i2c_init(i2c0, 400000);
 	gpio_set_function(I2C_GPIO_PIN_SDA, GPIO_FUNC_I2C);
 	gpio_set_function(I2C_GPIO_PIN_SLC, GPIO_FUNC_I2C);
-	gpio_pull_up(I2C_GPIO_PIN_SDA);
-	gpio_pull_up(I2C_GPIO_PIN_SLC);
+	//gpio_pull_up(I2C_GPIO_PIN_SDA);
+	//gpio_pull_up(I2C_GPIO_PIN_SLC);
 
 	setup_output(mcp1);
 	mcp1.set_all_output_bits(MCP_ALL_PINS_OFF);
 
 	printf("Setting MCP(0x21) pin 4\n");
-	mcp1.set_output_bit_for_pin(4, true);
+	mcp1.set_output_bit_for_pin(8, true);
 	mcp1.flush_output();
 
     return 0;

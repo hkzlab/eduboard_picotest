@@ -15,6 +15,6 @@ set(CMAKE_CXX_STANDARD 20)
 add_subdirectory(src)
 
 
-# Enable usb output, disable uart output
+# Enable uart output, disable usb output
 pico_enable_stdio_usb(${PROJECT_NAME} 0)
 pico_enable_stdio_uart(${PROJECT_NAME} 1)
