@@ -1,0 +1,72 @@
+{
+    // These settings tweaks to the cmake plugin will ensure
+    // that you debug using cortex-debug instead of trying to launch
+    // a Pico binary on the host
+    "cmake.statusbar.advanced": {
+        "debug": {
+            "visibility": "hidden"
+        },
+        "launch": {
+            "visibility": "hidden"
+        },
+        "build": {
+            "visibility": "default"
+        },
+        "buildTarget": {
+            "visibility": "hidden"
+        }
+    },
+    "cmake.buildBeforeRun": true,
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "files.associations": {
+        "sys.h": "c",
+        "types.h": "c",
+        "ssd1306_font.h": "c",
+        "sstream": "c",
+        "hw_config.h": "c",
+        "ff_sddisk.h": "c",
+        "ff_headers.h": "c",
+        "ff_stdio.h": "c",
+        "task.h": "c",
+        "semphr.h": "c",
+        "util.h": "c",
+        "gpio.h": "c",
+        "common_macros.h": "c",
+        "shifter_io_task.h": "c",
+        "random": "c",
+        "data_structs.h": "c",
+        "generic_ic_handler.h": "c",
+        "ic_handlers.h": "c",
+        "platform.h": "c",
+        "queue.h": "c",
+        "ff_utils.h": "c",
+        "driver.h": "c",
+        "printf.h": "c",
+        "custom_debug.h": "c",
+        "stdio_usb.h": "c",
+        "stdio.h": "c",
+        "tusb.h": "c",
+        "cdc_device.h": "c",
+        "msc_device.h": "c",
+        "stdio_uart.h": "c",
+        "stdint.h": "c",
+        "stdint-gcc.h": "c",
+        "cstdint": "c",
+        "usbd_pvt.h": "c",
+        "freertos.h": "c",
+        "piso_shifter.h": "c",
+        "sipo_shifter.h": "c",
+        "array": "c",
+        "string": "c",
+        "string_view": "c",
+        "ranges": "c",
+        "span": "c",
+        "compare": "c",
+        "cmd_cxfer.h": "c",
+        "bin_cmd_handler.h": "c",
+        "cmd_handler.h": "c",
+        "string.h": "c",
+        "command_hub_task.h": "c",
+        "stdlib.h": "c"
+    }
+}
