@@ -75,13 +75,14 @@ bool snow_update_timer_isr(struct repeating_timer *t) {
 
 	// Start from bottom, go upward, skip the first line
 	for(uint8_t idx = sizeof(snow) - 1; idx >= 1; idx--) {
-		snow_diff = (snow[idx] ^ snow[idx - 1]) & snow[idx - 1]; // The flakes that move from above to bottom
+		snow_diff = (snow[idx] ^ snow[idx - 1]) & snow[idx - 1]; // Find which flakes move from above row to current row
 		snow[idx] |= snow_diff;
-		snow[idx - 1] &= ~snow_diff;
+		snow[idx - 1] &= ~snow_diff; // Clear the flakes on the row above that moved to the current row
 	}
 
 	// Then generate new snowflakes 
-	snow[0] |= (uint8_t)(get_rand_32() & get_rand_32() & get_rand_32());
+	uint32_t rand = get_rand_32();
+	snow[0] |= (uint8_t)(rand & (rand >> 8) & (rand >> 16));
 	
 	return true;
 }
