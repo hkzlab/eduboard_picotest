@@ -26,7 +26,7 @@ const uint8_t __in_flash() row_address_translation[8] = {
 
 Mcp23017 mcp1(i2c0, 0x20); // MCP with A0, A1 and A2 to GND
 
-static volatile uint8_t cur_row = 0; // Current row that will be drawn
+static volatile uint8_t cur_row = 0; // Current row that will be drawn. Note that this will always increase, we are just using the first 3 bit by masking the rest
 static volatile bool invert = false; // If true, the display on the eduboard will be inverted
 static struct repeating_timer led_update_timer, snow_update_timer;
 
@@ -43,6 +43,7 @@ void setup_output(Mcp23017 mcp) {
 	result = mcp.set_io_direction(0x0000); // Set all pins to output
 }
 
+// This takes care of continuously drawing the image on the lines of the matrix
 bool led_update_timer_isr(struct repeating_timer *t) {
 	// Turn off the columns (leave the row selected, otherwise we risk shortly blinking the wrong led!!!)
 	mcp1.set_all_output_bits((row_address_translation[cur_row & 0x7]) << 5);
@@ -67,9 +68,10 @@ bool check_full_matrix() {
 	return true;
 }
 
+// This will take care of updating the "screen buffer", or the snow array
 bool snow_update_timer_isr(struct repeating_timer *t) {
 	const uint8_t snow_len = sizeof(snow);
-	uint snow_diff;
+	uint8_t snow_diff;
 
 	if(check_full_matrix()) {
 		memset((void*)snow, 0, sizeof(snow));
@@ -109,7 +111,7 @@ int main() {
 
 	add_repeating_timer_us(-500, led_update_timer_isr, NULL, &led_update_timer);
 	add_repeating_timer_us(-40000, snow_update_timer_isr, NULL, &snow_update_timer);
-	
+
 	while(true);
 
 	return 0;
