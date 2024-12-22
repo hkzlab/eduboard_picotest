@@ -11,6 +11,8 @@
 #define I2C_GPIO_PIN_SDA 20
 #define I2C_GPIO_PIN_SLC 21
 
+// Given that A0 and A2 are swapped when connected between the MCP expander and the '238 multiplexer.
+// we precalculate the correct bit pattern we want to set on the MCP depending on the row we wish to light up.
 const uint8_t __in_flash() row_address_translation[8] = { 
 	0x00,
 	0x04,
@@ -24,10 +26,11 @@ const uint8_t __in_flash() row_address_translation[8] = {
 
 Mcp23017 mcp1(i2c0, 0x20); // MCP with A0, A1 and A2 to GND
 
-static volatile uint8_t cur_row = 0;
-static volatile bool invert = false;
+static volatile uint8_t cur_row = 0; // Current row that will be drawn
+static volatile bool invert = false; // If true, the display on the eduboard will be inverted
 static struct repeating_timer led_update_timer, snow_update_timer;
 
+// This is our buffer that we'll draw on screen
 static volatile uint8_t snow[8] = {
 	0, 0, 0, 0,
 	0, 0, 0, 0
@@ -95,7 +98,7 @@ int main() {
 	i2c_init(i2c0, 400000);
 	gpio_set_function(I2C_GPIO_PIN_SDA, GPIO_FUNC_I2C);
 	gpio_set_function(I2C_GPIO_PIN_SLC, GPIO_FUNC_I2C);
-	//gpio_pull_up(I2C_GPIO_PIN_SDA);
+	//gpio_pull_up(I2C_GPIO_PIN_SDA); // Enable these if the eduboard doesn't have the I2C pullups installed
 	//gpio_pull_up(I2C_GPIO_PIN_SLC);
 
 	setup_output(mcp1);
